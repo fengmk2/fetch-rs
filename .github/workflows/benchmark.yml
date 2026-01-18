@@ -114,16 +114,17 @@ jobs:
 
           # Parse JSON results (use sed instead of grep -oP for portability)
           # Output format has header/separator lines, so use -A10 to capture the full section
-          JSON_FETCH=$(echo "$OUTPUT" | grep -A10 "## JSON" | grep "^fetch-rs" | awk '{print $2}' | tr -d ',')
-          JSON_NODE=$(echo "$OUTPUT" | grep -A10 "## JSON" | grep "^node-http" | awk '{print $2}' | tr -d ',')
+          # Column 1: Server, Column 2: Requests, Column 3: RPS
+          JSON_FETCH=$(echo "$OUTPUT" | grep -A10 "## JSON" | grep "^fetch-rs" | awk '{print $3}' | tr -d ',')
+          JSON_NODE=$(echo "$OUTPUT" | grep -A10 "## JSON" | grep "^node-http" | awk '{print $3}' | tr -d ',')
           JSON_COMP=$(echo "$OUTPUT" | grep -A10 "## JSON" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
-          TEXT_FETCH=$(echo "$OUTPUT" | grep -A10 "## TEXT" | grep "^fetch-rs" | awk '{print $2}' | tr -d ',')
-          TEXT_NODE=$(echo "$OUTPUT" | grep -A10 "## TEXT" | grep "^node-http" | awk '{print $2}' | tr -d ',')
+          TEXT_FETCH=$(echo "$OUTPUT" | grep -A10 "## TEXT" | grep "^fetch-rs" | awk '{print $3}' | tr -d ',')
+          TEXT_NODE=$(echo "$OUTPUT" | grep -A10 "## TEXT" | grep "^node-http" | awk '{print $3}' | tr -d ',')
           TEXT_COMP=$(echo "$OUTPUT" | grep -A10 "## TEXT" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
-          ECHO_FETCH=$(echo "$OUTPUT" | grep -A10 "## ECHO" | grep "^fetch-rs" | awk '{print $2}' | tr -d ',')
-          ECHO_NODE=$(echo "$OUTPUT" | grep -A10 "## ECHO" | grep "^node-http" | awk '{print $2}' | tr -d ',')
+          ECHO_FETCH=$(echo "$OUTPUT" | grep -A10 "## ECHO" | grep "^fetch-rs" | awk '{print $3}' | tr -d ',')
+          ECHO_NODE=$(echo "$OUTPUT" | grep -A10 "## ECHO" | grep "^node-http" | awk '{print $3}' | tr -d ',')
           ECHO_COMP=$(echo "$OUTPUT" | grep -A10 "## ECHO" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
           {
