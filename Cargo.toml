@@ -1,0 +1,42 @@
+[package]
+name = "fetch-rs"
+version = "0.1.0"
+edition = "2021"
+description = "High-performance web server with Fetch Event API powered by Rust and napi-rs"
+license = "MIT"
+repository = "https://github.com/example/fetch-rs"
+keywords = ["http", "server", "fetch", "napi", "nodejs"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# napi-rs for Node.js bindings
+napi = { version = "2", default-features = false, features = ["async", "tokio_rt", "napi6"] }
+napi-derive = "2"
+
+# HTTP server stack
+axum = "0.7"
+hyper = { version = "1.0", features = ["server", "http1", "http2"] }
+hyper-util = { version = "0.1", features = ["tokio", "server", "server-auto"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["timeout", "limit"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Utilities
+bytes = "1"
+http = "1.0"
+http-body-util = "0.1"
+socket2 = { version = "0.5", features = ["all"] }
+parking_lot = "0.12"
+tracing = "0.1"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3

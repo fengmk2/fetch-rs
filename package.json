@@ -1,0 +1,57 @@
+{
+  "name": "fetch-rs",
+  "version": "0.1.0",
+  "description": "High-performance web server with Fetch Event API powered by Rust and napi-rs",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "files": [
+    "dist",
+    "index.js",
+    "index.d.ts",
+    "*.node"
+  ],
+  "scripts": {
+    "build": "napi build --release && tsc",
+    "build:debug": "napi build && tsc",
+    "build:ts": "tsc",
+    "test": "vitest run",
+    "bench": "tsx benches/comparison.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "napi": {
+    "name": "fetch-rs",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-musl"
+      ]
+    }
+  },
+  "keywords": [
+    "http",
+    "server",
+    "fetch",
+    "napi",
+    "nodejs",
+    "rust",
+    "performance",
+    "web"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/fetch-rs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
+    "@types/node": "^22.19.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.4"
+  },
+  "packageManager": "pnpm@10.27.0"
+}
