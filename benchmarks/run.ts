@@ -75,6 +75,7 @@ async function startServer(
 
   // Wait for server to start
   await new Promise<void>((resolve, reject) => {
+    let started = false;
     const timeout = setTimeout(() => {
       reject(new Error(`${name} failed to start within 10 seconds`));
     }, 10000);
@@ -84,10 +85,10 @@ async function startServer(
       console.log(`  ${name}: ${output.trim()}`);
       // Match various server startup messages
       if (
-        output.includes("listening") ||
-        output.includes("starting") ||
-        output.includes("Server")
+        !started &&
+        (output.includes("listening") || output.includes("starting") || output.includes("Server"))
       ) {
+        started = true;
         clearTimeout(timeout);
         resolve();
       }
@@ -98,17 +99,23 @@ async function startServer(
     });
 
     proc.on("error", (err) => {
-      clearTimeout(timeout);
-      reject(err);
+      if (!started) {
+        clearTimeout(timeout);
+        reject(err);
+      }
     });
 
     proc.on("exit", (code) => {
-      if (code !== 0 && code !== null) {
+      // Only reject if server hasn't started yet and exit code indicates error
+      if (!started && code !== 0 && code !== null) {
         clearTimeout(timeout);
         reject(new Error(`${name} exited with code ${code}`));
       }
     });
   });
+
+  // Remove exit handler after startup to prevent issues during cleanup
+  proc.removeAllListeners("exit");
 
   console.log(`${name} started on port ${port}`);
   return proc;
@@ -283,25 +290,35 @@ async function main() {
     // Cleanup
     console.log("\nStopping servers...");
 
-    const killProcess = (proc: ChildProcess | null, name: string) => {
-      if (!proc) return;
-      try {
+    const killProcess = (proc: ChildProcess | null, name: string): Promise<void> => {
+      if (!proc || proc.killed) return Promise.resolve();
+
+      return new Promise((resolve) => {
         // Remove all listeners to prevent error events during shutdown
         proc.removeAllListeners();
         proc.stdout?.removeAllListeners();
         proc.stderr?.removeAllListeners();
-        proc.kill("SIGKILL");
-      } catch {
-        // Ignore errors during cleanup
-        console.log(`  Note: ${name} already stopped`);
-      }
+
+        // Set up exit handler before killing
+        proc.once("exit", () => resolve());
+        proc.once("error", () => resolve());
+
+        try {
+          proc.kill("SIGKILL");
+        } catch {
+          console.log(`  Note: ${name} already stopped`);
+          resolve();
+        }
+
+        // Timeout in case exit event doesn't fire
+        setTimeout(resolve, 500);
+      });
     };
 
-    killProcess(fetchRsProc, "fetch-rs");
-    killProcess(nodeHttpProc, "node-http");
-
-    // Give processes time to exit
-    await sleep(100);
+    await Promise.all([
+      killProcess(fetchRsProc, "fetch-rs"),
+      killProcess(nodeHttpProc, "node-http"),
+    ]);
   }
 }
 
@@ -310,12 +327,22 @@ process.on("unhandledRejection", () => {
   // Ignore - these can happen during cleanup
 });
 
+// Handle uncaught exceptions during cleanup
+process.on("uncaughtException", () => {
+  // Ignore - these can happen during cleanup
+});
+
 main()
   .then(() => {
     console.log("Benchmark complete.");
-    process.exit(0);
+    // Use setImmediate to ensure all pending callbacks are processed
+    setImmediate(() => {
+      process.exitCode = 0;
+      process.exit(0);
+    });
   })
   .catch((err) => {
     console.error("Benchmark failed:", err);
+    process.exitCode = 1;
     process.exit(1);
   });
