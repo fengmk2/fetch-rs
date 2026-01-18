@@ -281,22 +281,40 @@ async function main() {
   } finally {
     // Cleanup
     console.log('\nStopping servers...');
-    if (fetchRsProc) {
-      fetchRsProc.kill('SIGKILL');
-    }
-    if (nodeHttpProc) {
-      nodeHttpProc.kill('SIGKILL');
-    }
+
+    const killProcess = (proc: ChildProcess | null, name: string) => {
+      if (!proc) return;
+      try {
+        // Remove all listeners to prevent error events during shutdown
+        proc.removeAllListeners();
+        proc.stdout?.removeAllListeners();
+        proc.stderr?.removeAllListeners();
+        proc.kill('SIGKILL');
+      } catch (e) {
+        // Ignore errors during cleanup
+        console.log(`  Note: ${name} already stopped`);
+      }
+    };
+
+    killProcess(fetchRsProc, 'fetch-rs');
+    killProcess(nodeHttpProc, 'node-http');
+
     // Give processes time to exit
     await sleep(100);
   }
 }
 
+// Handle unhandled rejections (can happen when killing child processes)
+process.on('unhandledRejection', () => {
+  // Ignore - these can happen during cleanup
+});
+
 main()
   .then(() => {
+    console.log('Benchmark complete.');
     process.exit(0);
   })
   .catch((err) => {
-    console.error(err);
+    console.error('Benchmark failed:', err);
     process.exit(1);
   });
