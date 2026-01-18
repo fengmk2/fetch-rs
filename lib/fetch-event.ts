@@ -405,17 +405,30 @@ export class FetchEvent {
     }
     this._responded = true;
 
+    let responseSent = false;
+
     Promise.resolve(response)
       .then((res) => {
         this._respondCallback(res._toJsResponse());
+        responseSent = true;
       })
       .catch((error: Error) => {
-        // Send error response
-        const errorResponse = new Response(
-          `Internal Server Error: ${error.message}`,
-          { status: 500 }
-        );
-        this._respondCallback(errorResponse._toJsResponse());
+        // Only try to send error response if we haven't already sent one
+        if (responseSent) {
+          // Response was already sent, just log the error
+          console.error('Error after response sent:', error);
+          return;
+        }
+        try {
+          const errorResponse = new Response(
+            `Internal Server Error: ${error.message}`,
+            { status: 500 }
+          );
+          this._respondCallback(errorResponse._toJsResponse());
+        } catch (sendError) {
+          // Failed to send error response, log and ignore
+          console.error('Failed to send error response:', sendError);
+        }
       });
   }
 

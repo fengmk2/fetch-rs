@@ -17,10 +17,10 @@ Test endpoint returning `{"message": "Hello, World!"}`.
 
 | Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
 |--------|----------|-----|-------------|-------------|-------------|------------|
-| **fetch-rs** | 1,045,855 | **209,165** | **1.91ms** | 2.00ms | **3ms** | 26.93 MB/s |
-| node-http | 743,158 | 148,646 | 2.91ms | 2.00ms | 5ms | 28.49 MB/s |
+| **fetch-rs** | 1,065,959 | **213,158** | **1.86ms** | 2.00ms | **3ms** | 27.45 MB/s |
+| node-http | 750,852 | 150,182 | 2.90ms | 2.00ms | 5ms | 28.79 MB/s |
 
-**fetch-rs is 1.41x faster in RPS and has 1.52x lower average latency**
+**fetch-rs is 1.42x faster in RPS and has 1.56x lower average latency**
 
 ### Text Response Benchmark
 
@@ -28,7 +28,10 @@ Test endpoint returning plain text `Hello, World!`.
 
 | Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
 |--------|----------|-----|-------------|-------------|-------------|------------|
-| node-http | 754,878 | 150,976 | 2.88ms | 2.00ms | 5ms | 25.92 MB/s |
+| **fetch-rs** | 1,106,252 | **221,274** | **1.78ms** | 2.00ms | **3ms** | 24.26 MB/s |
+| node-http | 747,817 | 149,568 | 2.89ms | 2.00ms | 5ms | 25.68 MB/s |
+
+**fetch-rs is 1.48x faster in RPS and has 1.62x lower average latency**
 
 ### Echo Body Benchmark
 
@@ -36,7 +39,10 @@ Test endpoint that echoes back the request body.
 
 | Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
 |--------|----------|-----|-------------|-------------|-------------|------------|
-| node-http | 618,521 | 123,693 | 3.64ms | 3.00ms | 7ms | 21.23 MB/s |
+| **fetch-rs** | 944,499 | **188,890** | **2.15ms** | 2.00ms | **4ms** | 16.03 MB/s |
+| node-http | 607,007 | 121,402 | 3.70ms | 3.00ms | 7ms | 20.84 MB/s |
+
+**fetch-rs is 1.56x faster in RPS and has 1.72x lower average latency**
 
 ## Configuration
 
