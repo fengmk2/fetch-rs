@@ -2,8 +2,8 @@
  * Server wrapper class that provides the addEventListener API
  */
 
-import { Server as NativeServer } from '../index.js';
-import { FetchEvent, type FetchEventHandler } from './fetch-event.js';
+import { Server as NativeServer } from "../index.js";
+import { FetchEvent, type FetchEventHandler } from "./fetch-event.js";
 
 /**
  * Server configuration options
@@ -76,9 +76,9 @@ export class Server {
    * @param event - Must be 'fetch'
    * @param handler - The handler function
    */
-  addEventListener(event: 'fetch', handler: FetchEventHandler): void {
-    if (event !== 'fetch') {
-      throw new Error(`Unknown event type: ${event}`);
+  addEventListener(event: "fetch", handler: FetchEventHandler): void {
+    if (event !== "fetch") {
+      throw new Error(`Unknown event type: ${event as string}`);
     }
     this._handlers.push(handler);
   }
@@ -89,9 +89,9 @@ export class Server {
    * @param event - Must be 'fetch'
    * @param handler - The handler function to remove
    */
-  removeEventListener(event: 'fetch', handler: FetchEventHandler): void {
-    if (event !== 'fetch') {
-      throw new Error(`Unknown event type: ${event}`);
+  removeEventListener(event: "fetch", handler: FetchEventHandler): void {
+    if (event !== "fetch") {
+      throw new Error(`Unknown event type: ${event as string}`);
     }
     const index = this._handlers.indexOf(handler);
     if (index !== -1) {
@@ -104,13 +104,15 @@ export class Server {
    */
   async listen(): Promise<void> {
     if (this._handlers.length === 0) {
-      throw new Error('No fetch handler registered. Call addEventListener("fetch", handler) before listen()');
+      throw new Error(
+        'No fetch handler registered. Call addEventListener("fetch", handler) before listen()',
+      );
     }
 
     // Set up the native handler that dispatches to JS handlers
     this._native.setHandler((err, ctx) => {
       if (err) {
-        console.error('Error from native handler:', err);
+        console.error("Error from native handler:", err);
         return;
       }
 
@@ -119,14 +121,22 @@ export class Server {
       // Call all registered handlers
       for (const handler of this._handlers) {
         try {
-          handler(event);
+          const result = handler(event);
+          // Handle async handlers
+          if (result instanceof Promise) {
+            result.catch((error) => {
+              console.error("Error in async fetch handler:", error);
+            });
+          }
         } catch (error) {
-          console.error('Error in fetch handler:', error);
+          console.error("Error in fetch handler:", error);
         }
       }
     });
 
-    console.log(`Server starting on http://${this._options.host || '0.0.0.0'}:${this._options.port}`);
+    console.log(
+      `Server starting on http://${this._options.host || "0.0.0.0"}:${this._options.port}`,
+    );
     await this._native.listen();
   }
 
@@ -161,6 +171,6 @@ export class Server {
    * Get the server host
    */
   get host(): string {
-    return this._options.host || '0.0.0.0';
+    return this._options.host || "0.0.0.0";
   }
 }

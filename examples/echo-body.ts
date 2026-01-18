@@ -6,88 +6,86 @@
  * Run with: npx tsx examples/echo-body.ts
  */
 
-import { Server, Response, Headers, FetchEvent } from '../lib/index.js';
+import { Server, Response, FetchEvent } from "../lib/index.js";
 
 async function main() {
-const server = new Server({
-  port: 3000,
-  maxBodySize: 10 * 1024 * 1024, // 10MB limit
-});
+  const server = new Server({
+    port: 3000,
+    maxBodySize: 10 * 1024 * 1024, // 10MB limit
+  });
 
-server.addEventListener('fetch', async (event: FetchEvent) => {
-  const { request } = event;
-  const url = new URL(request.url);
+  server.addEventListener("fetch", async (event: FetchEvent) => {
+    const { request } = event;
+    const url = new URL(request.url);
 
-  // Echo as text
-  if (url.pathname === '/echo/text' && request.method === 'POST') {
-    const body = await request.text();
-    event.respondWith(
-      new Response(body, {
-        headers: {
-          'Content-Type': 'text/plain',
-          'X-Echo-Length': String(body.length),
-        },
-      })
-    );
-    return;
-  }
+    // Echo as text
+    if (url.pathname === "/echo/text" && request.method === "POST") {
+      const body = await request.text();
+      event.respondWith(
+        new Response(body, {
+          headers: {
+            "Content-Type": "text/plain",
+            "X-Echo-Length": String(body.length),
+          },
+        }),
+      );
+      return;
+    }
 
-  // Echo as JSON (parse and re-stringify)
-  if (url.pathname === '/echo/json' && request.method === 'POST') {
-    try {
-      const json = await request.json();
+    // Echo as JSON (parse and re-stringify)
+    if (url.pathname === "/echo/json" && request.method === "POST") {
+      try {
+        const json = await request.json();
+        event.respondWith(
+          Response.json({
+            echoed: json,
+            timestamp: Date.now(),
+          }),
+        );
+      } catch {
+        event.respondWith(Response.json({ error: "Invalid JSON" }, { status: 400 }));
+      }
+      return;
+    }
+
+    // Echo with headers inspection
+    if (url.pathname === "/echo/inspect" && request.method === "POST") {
+      const body = await request.text();
+      const headers: Record<string, string> = {};
+
+      for (const [key, value] of request.headers) {
+        headers[key] = value;
+      }
+
       event.respondWith(
         Response.json({
-          echoed: json,
-          timestamp: Date.now(),
-        })
+          method: request.method,
+          url: request.url,
+          headers,
+          bodyLength: body.length,
+          bodyPreview: body.slice(0, 100) + (body.length > 100 ? "..." : ""),
+        }),
       );
-    } catch {
+      return;
+    }
+
+    // Simple echo (any path, any method with body)
+    if (request.method === "POST" || request.method === "PUT") {
+      const body = await request.text();
+      const contentType = request.headers.get("content-type") || "text/plain";
+
       event.respondWith(
-        Response.json({ error: 'Invalid JSON' }, { status: 400 })
+        new Response(body, {
+          headers: { "Content-Type": contentType },
+        }),
       );
-    }
-    return;
-  }
-
-  // Echo with headers inspection
-  if (url.pathname === '/echo/inspect' && request.method === 'POST') {
-    const body = await request.text();
-    const headers: Record<string, string> = {};
-
-    for (const [key, value] of request.headers) {
-      headers[key] = value;
+      return;
     }
 
+    // Instructions
     event.respondWith(
-      Response.json({
-        method: request.method,
-        url: request.url,
-        headers,
-        bodyLength: body.length,
-        bodyPreview: body.slice(0, 100) + (body.length > 100 ? '...' : ''),
-      })
-    );
-    return;
-  }
-
-  // Simple echo (any path, any method with body)
-  if (request.method === 'POST' || request.method === 'PUT') {
-    const body = await request.text();
-    const contentType = request.headers.get('content-type') || 'text/plain';
-
-    event.respondWith(
-      new Response(body, {
-        headers: { 'Content-Type': contentType },
-      })
-    );
-    return;
-  }
-
-  // Instructions
-  event.respondWith(
-    new Response(
-      `Echo Server
+      new Response(
+        `Echo Server
 
 Endpoints:
   POST /echo/text    - Echo body as text
@@ -99,13 +97,13 @@ Examples:
   curl -X POST -d "Hello" http://localhost:3000/echo/text
   curl -X POST -H "Content-Type: application/json" -d '{"foo":"bar"}' http://localhost:3000/echo/json
 `,
-      { headers: { 'Content-Type': 'text/plain' } }
-    )
-  );
-});
+        { headers: { "Content-Type": "text/plain" } },
+      ),
+    );
+  });
 
-await server.listen();
-console.log('Echo server listening on http://localhost:3000');
+  await server.listen();
+  console.log("Echo server listening on http://localhost:3000");
 }
 
 main().catch(console.error);

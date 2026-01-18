@@ -31,6 +31,7 @@ fetch-rs is a high-performance HTTP server for Node.js, powered by Rust and napi
 ```
 
 **Key components:**
+
 - **Rust layer** (`src/`): HTTP server using Axum/Hyper/Tokio stack, handles all I/O
 - **napi-rs bindings**: Zero-copy data transfer between Rust and Node.js via `Buffer` and `ThreadsafeFunction`
 - **TypeScript layer** (`lib/`): WinterCG-compatible Fetch Event API (Request, Response, Headers, FetchEvent classes)
@@ -59,9 +60,15 @@ npx tsx examples/hello-world.ts
 npx tsx examples/json-api.ts
 npx tsx examples/echo-body.ts
 
-# Lint (Rust only)
+# Lint and format (Rust)
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features -- -D warnings
+
+# Lint and format (TypeScript)
+pnpm lint               # Run oxlint with type checking
+pnpm lint:fix           # Auto-fix lint issues
+pnpm fmt                # Format code with oxfmt
+pnpm fmt:check          # Check formatting
 ```
 
 ## Project Structure
@@ -87,12 +94,14 @@ fetch-rs/
 ## Key Technical Details
 
 ### napi-rs v3 API
+
 - `ThreadsafeFunction<T, ()>` for async callbacks (no `ErrorStrategy` in v3)
 - `ThreadsafeFunction` must be wrapped in `Arc` (doesn't implement `Clone`)
 - Callback signature: `(err: Error | null, ctx: T) => void`
 - `Buffer` for zero-copy data transfer (doesn't implement `Clone`)
 
 ### Request Flow
+
 1. HTTP request arrives at Rust server (Axum)
 2. Rust creates `RequestContext` with method, url, headers, body
 3. Rust calls JS handler via `ThreadsafeFunction`
@@ -102,6 +111,7 @@ fetch-rs/
 7. Rust sends HTTP response
 
 ### Module Format
+
 - Project uses ESM (`"type": "module"` in package.json)
 - Native binary built with `--esm` flag via napi-rs
 - TypeScript compiles to ES modules
@@ -128,6 +138,7 @@ pnpm bench         # Full benchmark with more iterations
 ```
 
 Benchmark scenarios:
+
 - **JSON**: JSON serialization response
 - **Text**: Plain text response
 - **Echo**: Echo request body back
@@ -135,7 +146,8 @@ Benchmark scenarios:
 ## CI/CD
 
 GitHub Actions workflows:
-- **CI** (`.github/workflows/ci.yml`): Tests on Linux/macOS/Windows + Rust lint
+
+- **CI** (`.github/workflows/ci.yml`): Tests on Linux/macOS/Windows + Rust/TypeScript lint
 - **Benchmark** (`.github/workflows/benchmark.yml`): Runs benchmarks on PRs with comment
 
 ## Important Notes

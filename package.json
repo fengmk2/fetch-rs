@@ -2,6 +2,28 @@
   "name": "fetch-rs",
   "version": "0.1.0",
   "description": "High-performance web server with Fetch Event API powered by Rust and napi-rs",
+  "keywords": [
+    "fetch",
+    "http",
+    "napi",
+    "nodejs",
+    "performance",
+    "rust",
+    "server",
+    "web"
+  ],
+  "license": "MIT",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/fetch-rs"
+  },
+  "files": [
+    "*.node",
+    "dist",
+    "index.d.ts",
+    "index.js"
+  ],
   "type": "module",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
@@ -11,21 +33,30 @@
       "import": "./dist/lib/index.js"
     }
   },
-  "files": [
-    "dist",
-    "index.js",
-    "index.d.ts",
-    "*.node"
-  ],
   "scripts": {
     "build": "napi build --platform --release --esm && tsc",
     "build:debug": "napi build --platform --esm && tsc",
     "build:ts": "tsc",
     "test": "vitest run",
+    "lint": "oxlint --type-aware --type-check",
+    "lint:fix": "oxlint --type-aware --type-check --fix",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check .",
     "bench": "tsx benchmarks/run.ts",
     "bench:oha": "./benchmarks/run-oha.sh",
     "bench:quick": "tsx benchmarks/run.ts --duration=5 --connections=50",
     "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.5.1",
+    "@types/node": "^22.19.7",
+    "autocannon": "^8.0.0",
+    "oxfmt": "^0.24.0",
+    "oxlint": "^1.39.0",
+    "oxlint-tsgolint": "^0.11.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.17"
   },
   "napi": {
     "binaryName": "fetch-rs",
@@ -38,30 +69,6 @@
       "aarch64-unknown-linux-musl",
       "x86_64-pc-windows-msvc"
     ]
-  },
-  "keywords": [
-    "http",
-    "server",
-    "fetch",
-    "napi",
-    "nodejs",
-    "rust",
-    "performance",
-    "web"
-  ],
-  "author": "",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/example/fetch-rs"
-  },
-  "devDependencies": {
-    "@napi-rs/cli": "^3.5.1",
-    "@types/node": "^22.19.7",
-    "autocannon": "^8.0.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "vitest": "^4.0.17"
   },
   "packageManager": "pnpm@10.27.0"
 }

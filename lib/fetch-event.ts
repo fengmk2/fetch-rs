@@ -5,7 +5,7 @@
  * compatible with the Service Worker / Cloudflare Workers Fetch Event pattern.
  */
 
-import type { RequestContext, JsResponse, JsHeader, HeaderPair } from '../index.js';
+import type { RequestContext, JsResponse, JsHeader, HeaderPair } from "../index.js";
 
 /**
  * Headers class - WinterCG compatible Headers implementation
@@ -26,12 +26,12 @@ export class Headers implements Iterable<[string, string]> {
           if (Array.isArray(item)) {
             // Tuple format: [name, value]
             this._headers.set(item[0].toLowerCase(), item[1]);
-          } else if (typeof item === 'object' && 'name' in item && 'value' in item) {
+          } else if (typeof item === "object" && "name" in item && "value" in item) {
             // HeaderPair format: { name, value }
             this._headers.set(item.name.toLowerCase(), item.value);
           }
         }
-      } else if (typeof init === 'object') {
+      } else if (typeof init === "object") {
         for (const [key, value] of Object.entries(init)) {
           this._headers.set(key.toLowerCase(), value);
         }
@@ -123,7 +123,7 @@ export class Request {
       this._body = input._body;
     } else {
       const url = input instanceof URL ? input.toString() : input;
-      this.method = init?.method ?? 'GET';
+      this.method = init?.method ?? "GET";
       this.url = url;
       this.headers = new Headers(init?.headers);
       this._body = init?.body ? Buffer.from(init.body as string | Buffer) : null;
@@ -161,8 +161,8 @@ export class Request {
   async text(): Promise<string> {
     this._checkBodyUsed();
     this._bodyUsed = true;
-    if (!this._body) return '';
-    return this._body.toString('utf-8');
+    if (!this._body) return "";
+    return this._body.toString("utf-8");
   }
 
   async json<T = unknown>(): Promise<T> {
@@ -179,12 +179,12 @@ export class Request {
 
   async formData(): Promise<FormData> {
     // Basic FormData parsing - would need more complete implementation
-    throw new Error('FormData parsing not yet implemented');
+    throw new Error("FormData parsing not yet implemented");
   }
 
   clone(): Request {
     if (this._bodyUsed) {
-      throw new TypeError('Cannot clone a Request whose body has been used');
+      throw new TypeError("Cannot clone a Request whose body has been used");
     }
     return new Request(this.url, {
       method: this.method,
@@ -195,7 +195,7 @@ export class Request {
 
   private _checkBodyUsed(): void {
     if (this._bodyUsed) {
-      throw new TypeError('Body has already been consumed');
+      throw new TypeError("Body has already been consumed");
     }
   }
 
@@ -230,12 +230,12 @@ export class Response {
 
   constructor(body?: BodyInit | null, init?: ResponseInit) {
     this.status = init?.status ?? 200;
-    this.statusText = init?.statusText ?? 'OK';
+    this.statusText = init?.statusText ?? "OK";
     this.headers = new Headers(init?.headers);
 
     if (body === null || body === undefined) {
       this._body = null;
-    } else if (typeof body === 'string') {
+    } else if (typeof body === "string") {
       this._body = Buffer.from(body);
     } else if (Buffer.isBuffer(body)) {
       this._body = body;
@@ -282,8 +282,8 @@ export class Response {
   async text(): Promise<string> {
     this._checkBodyUsed();
     this._bodyUsed = true;
-    if (!this._body) return '';
-    return this._body.toString('utf-8');
+    if (!this._body) return "";
+    return this._body.toString("utf-8");
   }
 
   async json<T = unknown>(): Promise<T> {
@@ -299,12 +299,12 @@ export class Response {
   }
 
   async formData(): Promise<FormData> {
-    throw new Error('FormData parsing not yet implemented');
+    throw new Error("FormData parsing not yet implemented");
   }
 
   clone(): Response {
     if (this._bodyUsed) {
-      throw new TypeError('Cannot clone a Response whose body has been used');
+      throw new TypeError("Cannot clone a Response whose body has been used");
     }
     return new Response(this._body, {
       status: this.status,
@@ -315,7 +315,7 @@ export class Response {
 
   private _checkBodyUsed(): void {
     if (this._bodyUsed) {
-      throw new TypeError('Body has already been consumed');
+      throw new TypeError("Body has already been consumed");
     }
   }
 
@@ -325,7 +325,7 @@ export class Response {
   static json(data: unknown, init?: ResponseInit): Response {
     const body = JSON.stringify(data);
     const headers = new Headers(init?.headers);
-    headers.set('content-type', 'application/json');
+    headers.set("content-type", "application/json");
 
     return new Response(body, {
       ...init,
@@ -388,7 +388,7 @@ export class FetchEvent {
   constructor(
     request: Request,
     clientAddress: string,
-    respondCallback: (response: JsResponse) => void
+    respondCallback: (response: JsResponse) => void,
   ) {
     this.request = request;
     this.clientAddress = clientAddress;
@@ -401,7 +401,7 @@ export class FetchEvent {
    */
   respondWith(response: Response | Promise<Response>): void {
     if (this._responded) {
-      throw new Error('respondWith() has already been called');
+      throw new Error("respondWith() has already been called");
     }
     this._responded = true;
 
@@ -416,18 +416,17 @@ export class FetchEvent {
         // Only try to send error response if we haven't already sent one
         if (responseSent) {
           // Response was already sent, just log the error
-          console.error('Error after response sent:', error);
+          console.error("Error after response sent:", error);
           return;
         }
         try {
-          const errorResponse = new Response(
-            `Internal Server Error: ${error.message}`,
-            { status: 500 }
-          );
+          const errorResponse = new Response(`Internal Server Error: ${error.message}`, {
+            status: 500,
+          });
           this._respondCallback(errorResponse._toJsResponse());
         } catch (sendError) {
           // Failed to send error response, log and ignore
-          console.error('Failed to send error response:', sendError);
+          console.error("Failed to send error response:", sendError);
         }
       });
   }
