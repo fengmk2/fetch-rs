@@ -6,7 +6,6 @@ import { createServer, IncomingMessage, ServerResponse } from "node:http";
 
 const PORT = parseInt(process.env.PORT || "3001", 10);
 
-const JSON_RESPONSE = JSON.stringify({ message: "Hello, World!" });
 const TEXT_RESPONSE = "Hello, World!";
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -15,7 +14,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   switch (url.pathname) {
     case "/json":
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON_RESPONSE);
+      res.end(JSON.stringify({ message: "Hello, World!" }));
       break;
 
     case "/text":
@@ -36,7 +35,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 
     default:
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON_RESPONSE);
+      res.end(JSON.stringify({ message: "Hello, World!" }));
   }
 });
 
