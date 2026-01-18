@@ -282,12 +282,21 @@ async function main() {
     // Cleanup
     console.log('\nStopping servers...');
     if (fetchRsProc) {
-      fetchRsProc.kill();
+      fetchRsProc.kill('SIGKILL');
     }
     if (nodeHttpProc) {
-      nodeHttpProc.kill();
+      nodeHttpProc.kill('SIGKILL');
     }
+    // Give processes time to exit
+    await sleep(100);
   }
 }
 
-main().catch(console.error);
+main()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
