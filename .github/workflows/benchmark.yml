@@ -63,7 +63,6 @@ jobs:
       - name: Run benchmark
         id: benchmark
         run: |
-          set -x
           # Run benchmark and capture output (ignore exit code)
           OUTPUT=$(pnpm bench:quick 2>&1) || true
           echo "$OUTPUT"
@@ -104,18 +103,18 @@ jobs:
             echo "|----------|----------|-----------|-------------|"
           } > benchmark-summary.md
 
-          # Parse JSON results
+          # Parse JSON results (use sed instead of grep -oP for portability)
           JSON_FETCH=$(echo "$OUTPUT" | grep -A1 "## JSON" | grep "fetch-rs" | awk '{print $2}' | tr -d ',')
           JSON_NODE=$(echo "$OUTPUT" | grep -A2 "## JSON" | grep "node-http" | awk '{print $2}' | tr -d ',')
-          JSON_COMP=$(echo "$OUTPUT" | grep -A4 "## JSON" | grep "Comparison" | grep -oP '\d+\.\d+(?=x RPS)')
+          JSON_COMP=$(echo "$OUTPUT" | grep -A4 "## JSON" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
           TEXT_FETCH=$(echo "$OUTPUT" | grep -A1 "## TEXT" | grep "fetch-rs" | awk '{print $2}' | tr -d ',')
           TEXT_NODE=$(echo "$OUTPUT" | grep -A2 "## TEXT" | grep "node-http" | awk '{print $2}' | tr -d ',')
-          TEXT_COMP=$(echo "$OUTPUT" | grep -A4 "## TEXT" | grep "Comparison" | grep -oP '\d+\.\d+(?=x RPS)')
+          TEXT_COMP=$(echo "$OUTPUT" | grep -A4 "## TEXT" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
           ECHO_FETCH=$(echo "$OUTPUT" | grep -A1 "## ECHO" | grep "fetch-rs" | awk '{print $2}' | tr -d ',')
           ECHO_NODE=$(echo "$OUTPUT" | grep -A2 "## ECHO" | grep "node-http" | awk '{print $2}' | tr -d ',')
-          ECHO_COMP=$(echo "$OUTPUT" | grep -A4 "## ECHO" | grep "Comparison" | grep -oP '\d+\.\d+(?=x RPS)')
+          ECHO_COMP=$(echo "$OUTPUT" | grep -A4 "## ECHO" | grep "Comparison" | sed -n 's/.*is \([0-9.]*\)x RPS.*/\1/p')
 
           {
             echo "| JSON | ${JSON_FETCH:-N/A} RPS | ${JSON_NODE:-N/A} RPS | **${JSON_COMP:-N/A}x faster** |"
