@@ -20,8 +20,13 @@ permissions:
 
 jobs:
   benchmark:
-    name: Run Benchmarks
-    runs-on: ubuntu-latest
+    name: Benchmark (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [22, 24]
 
     steps:
       - uses: actions/checkout@v6
@@ -29,7 +34,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -126,11 +131,11 @@ jobs:
             echo "| Text | ${TEXT_FETCH:-N/A} RPS | ${TEXT_NODE:-N/A} RPS | **${TEXT_COMP:-N/A}x faster** |"
             echo "| Echo | ${ECHO_FETCH:-N/A} RPS | ${ECHO_NODE:-N/A} RPS | **${ECHO_COMP:-N/A}x faster** |"
             echo ""
-            echo "*Benchmark run on \`ubuntu-latest\` with Node.js 22*"
+            echo "*Benchmark run on \`${{ matrix.os }}\` with Node.js ${{ matrix.node }}*"
           } >> benchmark-summary.md
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && matrix.node == 22
         uses: actions/github-script@v8
         with:
           script: |
