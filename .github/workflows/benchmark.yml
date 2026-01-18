@@ -67,8 +67,8 @@ jobs:
       - name: Run benchmark
         id: benchmark
         run: |
-          # Run benchmark and capture output (ignore exit code)
-          OUTPUT=$(pnpm bench:quick 2>&1) || true
+          # Run benchmark and capture output
+          OUTPUT=$(pnpm bench:quick 2>&1)
           echo "$OUTPUT"
 
           # Extract results section
