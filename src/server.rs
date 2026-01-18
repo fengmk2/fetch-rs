@@ -112,7 +112,7 @@ impl ServerInner {
                 }),
             );
 
-        let listener = TcpListener::from_std(listener.into())?;
+        let listener = TcpListener::from_std(listener)?;
 
         tracing::info!("Server listening on {}", addr);
 
