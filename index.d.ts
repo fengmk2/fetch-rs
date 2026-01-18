@@ -10,9 +10,9 @@ export declare class BodyHandle {
    * Returns null when the body is fully consumed
    * Note: This is marked unsafe because it takes &mut self in async context
    */
-  read(): Promise<Buffer | null>
+  read(): Promise<Buffer | null>;
   /** Check if there's more data to read */
-  isClosed(): boolean
+  isClosed(): boolean;
 }
 
 /**
@@ -21,49 +21,49 @@ export declare class BodyHandle {
  */
 export declare class RequestContext {
   /** Get the HTTP method */
-  get method(): string
+  get method(): string;
   /** Get the full URL */
-  get url(): string
+  get url(): string;
   /** Get headers as an array of {name, value} objects */
-  get headers(): Array<HeaderPair>
+  get headers(): Array<HeaderPair>;
   /** Get the request body as a Buffer (or null if no body) */
-  get body(): Buffer | null
+  get body(): Buffer | null;
   /** Get the client IP address */
-  get clientAddress(): string
+  get clientAddress(): string;
   /**
    * Send a response back to the client
    * This must be called exactly once per request
    */
-  respond(response: JsResponse): void
+  respond(response: JsResponse): void;
 }
 
 /** High-performance HTTP server with Fetch Event API */
 export declare class Server {
   /** Create a new server with the given options */
-  constructor(options: ServerOptions)
+  constructor(options: ServerOptions);
   /**
    * Set the fetch event handler
    * This should be called before listen()
    */
-  setHandler(handler: ((err: Error | null, arg: RequestContext) => void)): void
+  setHandler(handler: (err: Error | null, arg: RequestContext) => void): void;
   /** Start the server and begin accepting connections */
-  listen(): Promise<void>
+  listen(): Promise<void>;
   /** Gracefully shutdown the server */
-  close(): Promise<void>
+  close(): Promise<void>;
   /** Get current server statistics */
-  stats(): ServerStats
+  stats(): ServerStats;
 }
 
 /** Header as a two-element array [name, value] for JavaScript */
 export interface HeaderPair {
-  name: string
-  value: string
+  name: string;
+  value: string;
 }
 
 /** Header key-value pair for use in JsResponse */
 export interface JsHeader {
-  name: string
-  value: string
+  name: string;
+  value: string;
 }
 
 /**
@@ -72,37 +72,37 @@ export interface JsHeader {
  */
 export interface JsResponse {
   /** HTTP status code (200, 404, 500, etc.) */
-  status: number
+  status: number;
   /** Response headers as key-value pairs */
-  headers: Array<JsHeader>
+  headers: Array<JsHeader>;
   /** Response body (None for empty body) */
-  body?: Buffer
+  body?: Buffer;
 }
 
 /** Server options passed from JavaScript */
 export interface ServerOptions {
   /** Port to listen on */
-  port: number
+  port: number;
   /** Host to bind to (default: "0.0.0.0") */
-  host?: string
+  host?: string;
   /** Enable SO_REUSEPORT for multi-core scaling */
-  reusePort?: boolean
+  reusePort?: boolean;
   /** Maximum concurrent connections (default: 65536) */
-  maxConnections?: number
+  maxConnections?: number;
   /** Request body size limit in bytes (default: 10MB) */
-  maxBodySize?: number
+  maxBodySize?: number;
   /** Request timeout in milliseconds (default: 30000) */
-  timeout?: number
+  timeout?: number;
 }
 
 /** Server statistics */
 export interface ServerStats {
   /** Number of active connections */
-  activeConnections: number
+  activeConnections: number;
   /** Total requests handled (as f64 to avoid napi u64 issues) */
-  totalRequests: number
+  totalRequests: number;
   /** Requests per second (rolling average) */
-  requestsPerSecond: number
+  requestsPerSecond: number;
   /** Average latency in milliseconds */
-  avgLatencyMs: number
+  avgLatencyMs: number;
 }

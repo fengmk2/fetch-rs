@@ -5,17 +5,8 @@
  * (Axum/hyper/tokio) with zero-copy data transfer via napi-rs.
  */
 
-export {
-  FetchEvent,
-  Request,
-  Response,
-  Headers,
-  type FetchEventHandler,
-} from './fetch-event.js';
+export { FetchEvent, Request, Response, Headers, type FetchEventHandler } from "./fetch-event.js";
 
-export { Server } from './server.js';
+export { Server } from "./server.js";
 
-export type {
-  ServerOptions,
-  ServerStats,
-} from './server.js';
+export type { ServerOptions, ServerStats } from "./server.js";

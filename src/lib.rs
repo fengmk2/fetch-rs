@@ -77,10 +77,7 @@ impl Server {
     /// Set the fetch event handler
     /// This should be called before listen()
     #[napi]
-    pub fn set_handler(
-        &self,
-        handler: ThreadsafeFunction<RequestContext, ()>,
-    ) -> Result<()> {
+    pub fn set_handler(&self, handler: ThreadsafeFunction<RequestContext, ()>) -> Result<()> {
         self.inner.set_handler(handler);
         Ok(())
     }

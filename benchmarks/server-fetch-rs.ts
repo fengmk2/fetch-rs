@@ -2,42 +2,38 @@
  * fetch-rs server for benchmarking
  */
 
-import { Server, Response } from '../lib/index.js';
+import { Server, Response } from "../lib/index.js";
 
-const PORT = parseInt(process.env.PORT || '3000', 10);
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 async function main() {
   const server = new Server({ port: PORT });
 
-  server.addEventListener('fetch', (event) => {
+  server.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
     switch (url.pathname) {
-      case '/json':
+      case "/json":
+        event.respondWith(Response.json({ message: "Hello, World!" }));
+        break;
+
+      case "/text":
         event.respondWith(
-          Response.json({ message: 'Hello, World!' })
+          new Response("Hello, World!", {
+            headers: { "Content-Type": "text/plain" },
+          }),
         );
         break;
 
-      case '/text':
-        event.respondWith(
-          new Response('Hello, World!', {
-            headers: { 'Content-Type': 'text/plain' },
-          })
-        );
-        break;
-
-      case '/echo':
+      case "/echo":
         // Echo back the request body
-        event.request.text().then((body) => {
+        void event.request.text().then((body) => {
           event.respondWith(new Response(body));
         });
         break;
 
       default:
-        event.respondWith(
-          Response.json({ message: 'Hello, World!' })
-        );
+        event.respondWith(Response.json({ message: "Hello, World!" }));
     }
   });
 

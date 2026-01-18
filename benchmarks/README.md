@@ -16,10 +16,10 @@ Performance benchmarks comparing fetch-rs with native Node.js HTTP server.
 
 Test endpoint returning `{"message": "Hello, World!"}`.
 
-| Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
-|--------|----------|-----|-------------|-------------|-------------|------------|
-| **fetch-rs** | 1,146,064 | **229,210** | **1.69ms** | 2.00ms | **3ms** | 29.51 MB/s |
-| node-http | 745,454 | 149,107 | 2.92ms | 2.00ms | 5ms | 28.58 MB/s |
+| Server       | Requests  | RPS         | Latency Avg | Latency P50 | Latency P99 | Throughput |
+| ------------ | --------- | ----------- | ----------- | ----------- | ----------- | ---------- |
+| **fetch-rs** | 1,146,064 | **229,210** | **1.69ms**  | 2.00ms      | **3ms**     | 29.51 MB/s |
+| node-http    | 745,454   | 149,107     | 2.92ms      | 2.00ms      | 5ms         | 28.58 MB/s |
 
 **fetch-rs is 1.54x faster in RPS and has 1.73x lower average latency**
 
@@ -27,10 +27,10 @@ Test endpoint returning `{"message": "Hello, World!"}`.
 
 Test endpoint returning plain text `Hello, World!`.
 
-| Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
-|--------|----------|-----|-------------|-------------|-------------|------------|
-| **fetch-rs** | 1,129,904 | **226,010** | **1.71ms** | 2.00ms | **3ms** | 24.79 MB/s |
-| node-http | 706,695 | 141,325 | 3.04ms | 2.00ms | 6ms | 24.26 MB/s |
+| Server       | Requests  | RPS         | Latency Avg | Latency P50 | Latency P99 | Throughput |
+| ------------ | --------- | ----------- | ----------- | ----------- | ----------- | ---------- |
+| **fetch-rs** | 1,129,904 | **226,010** | **1.71ms**  | 2.00ms      | **3ms**     | 24.79 MB/s |
+| node-http    | 706,695   | 141,325     | 3.04ms      | 2.00ms      | 6ms         | 24.26 MB/s |
 
 **fetch-rs is 1.60x faster in RPS and has 1.78x lower average latency**
 
@@ -38,10 +38,10 @@ Test endpoint returning plain text `Hello, World!`.
 
 Test endpoint that echoes back the request body.
 
-| Server | Requests | RPS | Latency Avg | Latency P50 | Latency P99 | Throughput |
-|--------|----------|-----|-------------|-------------|-------------|------------|
-| **fetch-rs** | 996,701 | **199,360** | **2.02ms** | 2.00ms | **4ms** | 16.92 MB/s |
-| node-http | 614,106 | 122,822 | 3.61ms | 3.00ms | 7ms | 21.08 MB/s |
+| Server       | Requests | RPS         | Latency Avg | Latency P50 | Latency P99 | Throughput |
+| ------------ | -------- | ----------- | ----------- | ----------- | ----------- | ---------- |
+| **fetch-rs** | 996,701  | **199,360** | **2.02ms**  | 2.00ms      | **4ms**     | 16.92 MB/s |
+| node-http    | 614,106  | 122,822     | 3.61ms      | 3.00ms      | 7ms         | 21.08 MB/s |
 
 **fetch-rs is 1.62x faster in RPS and has 1.79x lower average latency**
 

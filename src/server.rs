@@ -112,7 +112,7 @@ impl ServerInner {
                 }),
             );
 
-        let listener = TcpListener::from_std(listener.into())?;
+        let listener = TcpListener::from_std(listener)?;
 
         tracing::info!("Server listening on {}", addr);
 
@@ -172,10 +172,9 @@ impl ServerInner {
             .active_connections
             .fetch_sub(1, Ordering::Relaxed);
         self.stats.total_requests.fetch_add(1, Ordering::Relaxed);
-        self.stats.total_latency_us.fetch_add(
-            start.elapsed().as_micros() as u64,
-            Ordering::Relaxed,
-        );
+        self.stats
+            .total_latency_us
+            .fetch_add(start.elapsed().as_micros() as u64, Ordering::Relaxed);
 
         response
     }
