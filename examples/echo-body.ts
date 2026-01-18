@@ -6,14 +6,15 @@
  * Run with: npx tsx examples/echo-body.ts
  */
 
-import { Server, Response, Headers } from '../lib/index';
+import { Server, Response, Headers, FetchEvent } from '../lib/index.js';
 
+async function main() {
 const server = new Server({
   port: 3000,
   maxBodySize: 10 * 1024 * 1024, // 10MB limit
 });
 
-server.addEventListener('fetch', async (event) => {
+server.addEventListener('fetch', async (event: FetchEvent) => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -105,3 +106,6 @@ Examples:
 
 await server.listen();
 console.log('Echo server listening on http://localhost:3000');
+}
+
+main().catch(console.error);

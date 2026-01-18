@@ -6,9 +6,7 @@ target/
 dist/
 *.node
 
-# Generated files
-index.js
-index.d.ts
+# Generated files (index.js and index.d.ts are committed for ESM support)
 
 # IDE
 .idea/

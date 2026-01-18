@@ -55,7 +55,7 @@ impl RequestContext {
     /// Get the request body as a Buffer (or null if no body)
     #[napi(getter)]
     pub fn get_body(&self) -> Option<Buffer> {
-        self.body.clone()
+        self.body.as_ref().map(|b| Buffer::from(b.as_ref().to_vec()))
     }
 
     /// Get the client IP address

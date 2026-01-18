@@ -108,7 +108,12 @@ export class Server {
     }
 
     // Set up the native handler that dispatches to JS handlers
-    this._native.setHandler((ctx) => {
+    this._native.setHandler((err, ctx) => {
+      if (err) {
+        console.error('Error from native handler:', err);
+        return;
+      }
+
       const event = FetchEvent._fromContext(ctx);
 
       // Call all registered handlers

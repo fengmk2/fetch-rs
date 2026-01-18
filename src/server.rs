@@ -13,7 +13,7 @@ use axum::{
 };
 use bytes::Bytes;
 use http_body_util::BodyExt;
-use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use parking_lot::{Mutex, RwLock};
 use socket2::{Domain, Protocol, Socket, Type};
 use std::net::SocketAddr;
@@ -50,7 +50,7 @@ impl From<&ServerOptions> for ServerConfig {
 /// Internal server state
 pub struct ServerInner {
     config: ServerConfig,
-    handler: RwLock<Option<ThreadsafeFunction<RequestContext, ErrorStrategy::Fatal>>>,
+    handler: RwLock<Option<Arc<ThreadsafeFunction<RequestContext, ()>>>>,
     shutdown_notify: Arc<Notify>,
     stats: ServerStatsInner,
 }
@@ -82,8 +82,8 @@ impl ServerInner {
         }
     }
 
-    pub fn set_handler(&self, handler: ThreadsafeFunction<RequestContext, ErrorStrategy::Fatal>) {
-        *self.handler.write() = Some(handler);
+    pub fn set_handler(&self, handler: ThreadsafeFunction<RequestContext, ()>) {
+        *self.handler.write() = Some(Arc::new(handler));
     }
 
     pub async fn listen(
@@ -185,18 +185,16 @@ impl ServerInner {
         client_addr: SocketAddr,
         req: Request,
     ) -> Response<Body> {
-        let handler = {
+        let handler: Arc<ThreadsafeFunction<RequestContext, ()>> = {
             let guard = self.handler.read();
-            guard.clone()
-        };
-
-        let handler = match handler {
-            Some(h) => h,
-            None => {
-                return Response::builder()
-                    .status(StatusCode::INTERNAL_SERVER_ERROR)
-                    .body(Body::from("No handler registered"))
-                    .unwrap();
+            match guard.as_ref() {
+                Some(h) => Arc::clone(h),
+                None => {
+                    return Response::builder()
+                        .status(StatusCode::INTERNAL_SERVER_ERROR)
+                        .body(Body::from("No handler registered"))
+                        .unwrap();
+                }
             }
         };
 
@@ -253,7 +251,7 @@ impl ServerInner {
         };
 
         // Call JavaScript handler
-        handler.call(request_context, ThreadsafeFunctionCallMode::NonBlocking);
+        handler.call(Ok(request_context), ThreadsafeFunctionCallMode::NonBlocking);
 
         // Wait for response from JavaScript
         match tokio::time::timeout(

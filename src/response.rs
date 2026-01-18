@@ -12,7 +12,6 @@ pub struct JsHeader {
 /// Response object passed from JavaScript to Rust
 /// Contains the HTTP response data to send back to the client
 #[napi(object)]
-#[derive(Clone)]
 pub struct JsResponse {
     /// HTTP status code (200, 404, 500, etc.)
     pub status: u16,

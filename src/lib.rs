@@ -5,7 +5,7 @@ mod response;
 mod server;
 
 use napi::bindgen_prelude::*;
-use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
+use napi::threadsafe_function::ThreadsafeFunction;
 use napi_derive::napi;
 use std::sync::Arc;
 
@@ -79,7 +79,7 @@ impl Server {
     #[napi]
     pub fn set_handler(
         &self,
-        handler: ThreadsafeFunction<RequestContext, ErrorStrategy::Fatal>,
+        handler: ThreadsafeFunction<RequestContext, ()>,
     ) -> Result<()> {
         self.inner.set_handler(handler);
         Ok(())

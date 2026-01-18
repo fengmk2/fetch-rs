@@ -2,8 +2,15 @@
   "name": "fetch-rs",
   "version": "0.1.0",
   "description": "High-performance web server with Fetch Event API powered by Rust and napi-rs",
+  "type": "module",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    }
+  },
   "files": [
     "dist",
     "index.js",
@@ -11,8 +18,8 @@
     "*.node"
   ],
   "scripts": {
-    "build": "napi build --release && tsc",
-    "build:debug": "napi build && tsc",
+    "build": "napi build --platform --release --esm && tsc",
+    "build:debug": "napi build --platform --esm && tsc",
     "build:ts": "tsc",
     "test": "vitest run",
     "bench": "tsx benchmarks/run.ts",
@@ -21,16 +28,16 @@
     "prepublishOnly": "npm run build"
   },
   "napi": {
-    "name": "fetch-rs",
-    "triples": {
-      "defaults": true,
-      "additional": [
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-        "aarch64-apple-darwin",
-        "aarch64-unknown-linux-musl"
-      ]
-    }
+    "binaryName": "fetch-rs",
+    "targets": [
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-unknown-linux-musl",
+      "x86_64-pc-windows-msvc"
+    ]
   },
   "keywords": [
     "http",
@@ -49,7 +56,7 @@
     "url": "https://github.com/example/fetch-rs"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.18.4",
+    "@napi-rs/cli": "^3.5.1",
     "@types/node": "^22.19.7",
     "autocannon": "^8.0.0",
     "tsx": "^4.19.2",
