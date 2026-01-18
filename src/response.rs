@@ -26,7 +26,13 @@ impl std::fmt::Debug for JsResponse {
         f.debug_struct("JsResponse")
             .field("status", &self.status)
             .field("headers", &self.headers)
-            .field("body", &self.body.as_ref().map(|b| format!("<Buffer {} bytes>", b.len())))
+            .field(
+                "body",
+                &self
+                    .body
+                    .as_ref()
+                    .map(|b| format!("<Buffer {} bytes>", b.len())),
+            )
             .finish()
     }
 }
